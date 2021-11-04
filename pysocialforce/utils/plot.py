@@ -219,7 +219,7 @@ class SceneVisualizer:
 
     def plot_obstacles(self):
         for s in self.scene.get_obstacles():
-            self.ax.plot(s[:, 0], s[:, 1], "-o", color="black", markersize=2.5)
+            self.ax.plot(s[:, 0], s[:, 1], "-o", color="black", markersize=1)
 
     def animation_init(self):
         self.plot_obstacles()

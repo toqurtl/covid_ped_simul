@@ -56,15 +56,16 @@ class Simulator:
         """Construct forces"""
         force_list = [
             forces.DesiredForce(),
-            forces.SocialForce(),
+            # forces.SocialForce(),
             forces.ObstacleForce(),
-            # forces.PedRepulsiveForce(),
+            forces.PedRepulsiveForce(),
             # forces.SpaceRepulsiveForce(),
+            forces.GoalAttractiveForce()
         ]
         group_forces = [
-            forces.GroupCoherenceForceAlt(),
-            forces.GroupRepulsiveForce(),
-            forces.GroupGazeForceAlt(),
+            # forces.GroupCoherenceForceAlt(),
+            # forces.GroupRepulsiveForce(),
+            # forces.GroupGazeForceAlt(),
         ]
         if self.scene_config("enable_group"):
             force_list += group_forces
@@ -76,7 +77,7 @@ class Simulator:
         return force_list
 
     def compute_forces(self):
-        """compute forces"""
+        """compute forces"""            
         return sum(map(lambda x: x.get_force(), self.forces))
 
     def get_states(self):
@@ -93,6 +94,7 @@ class Simulator:
     def step_once(self):
         """step once"""
         self.peds.step(self.compute_forces())
+        
 
     def step(self, n=1):
         """Step n time"""

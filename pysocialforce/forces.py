@@ -54,13 +54,14 @@ class GoalAttractiveForce(Force):
 
     def _get_force(self):
         F0 = (
-            1.0
+            -1.0
             / self.peds.tau()
             * (
                 np.expand_dims(self.peds.initial_speeds, -1) * self.peds.desired_directions()
                 - self.peds.vel()
             )
         )
+        print(F0)
         return F0 * self.factor
 
 
@@ -71,10 +72,12 @@ class PedRepulsiveForce(Force):
         potential_func = PedPedPotential(
             self.peds.step_width, v0=self.config("v0"), sigma=self.config("sigma"),
         )
+        
+       
         f_ab = -1.0 * potential_func.grad_r_ab(self.peds.state)
-
         fov = FieldOfView(phi=self.config("fov_phi"), out_of_view_factor=self.config("fov_factor"),)
-        w = np.expand_dims(fov(self.peds.desired_directions(), -f_ab), -1)
+        
+        w = np.expand_dims(fov(self.peds.desired_directions(), -f_ab), -1)        
         F_ab = w * f_ab
         return np.sum(F_ab, axis=1) * self.factor
 
@@ -290,7 +293,7 @@ class SocialForce(Force):
         )
 
         force = force_velocity + force_angle  # n*(n-1) x 2
-        force = np.sum(force.reshape((self.peds.size(), -1, 2)), axis=1)
+        force = np.sum(force.reshape((self.peds.size(), -1, 2)), axis=1)        
         return force * self.factor
 
 

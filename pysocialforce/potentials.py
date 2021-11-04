@@ -53,9 +53,10 @@ class PedPedPotential(object):
     def grad_r_ab(self, state, delta=1e-3):
         """Compute gradient wrt r_ab using finite difference differentiation."""
         r_ab = self.r_ab(state)
-        speeds = stateutils.speeds(state)
-        desired_directions = stateutils.desired_directions(state)
 
+        speeds = stateutils.speeds(state)
+        # desired_directions = stateutils.desired_directions(state)
+        desired_directions, desired_distance = stateutils.desired_directions(state)
         dx = np.array([[[delta, 0.0]]])
         dy = np.array([[[0.0, delta]]])
 
