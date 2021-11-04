@@ -1,5 +1,10 @@
+# experiment
+images/
+
 # cache
 __pycache__/
+*.egg-info/
+*.log
 
 # test
 playground.py
