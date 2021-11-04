@@ -60,8 +60,7 @@ class GoalAttractiveForce(Force):
                 np.expand_dims(self.peds.initial_speeds, -1) * self.peds.desired_directions()
                 - self.peds.vel()
             )
-        )
-        print(F0)
+        )        
         return F0 * self.factor
 
 
@@ -265,13 +264,14 @@ class SocialForce(Force):
     def _get_force(self):
         lambda_importance = self.config("lambda_importance", 2.0)
         gamma = self.config("gamma", 0.35)
+        gamma = 0.35
         n = self.config("n", 2)
         n_prime = self.config("n_prime", 3)
 
-        pos_diff = stateutils.each_diff(self.peds.pos())  # n*(n-1)x2 other - self
+        pos_diff = stateutils.each_diff(self.peds.pos())  # n*(n-1)x2 other - self        
         diff_direction, diff_length = stateutils.normalize(pos_diff)
         vel_diff = -1.0 * stateutils.each_diff(self.peds.vel())  # n*(n-1)x2 self - other
-
+        
         # compute interaction direction t_ij
         interaction_vec = lambda_importance * vel_diff + diff_direction
         interaction_direction, interaction_length = stateutils.normalize(interaction_vec)
@@ -282,6 +282,7 @@ class SocialForce(Force):
         )
         # compute model parameter B = gamma * ||D||
         B = gamma * interaction_length
+        
 
         force_velocity_amount = np.exp(-1.0 * diff_length / B - np.square(n_prime * B * theta))
         force_angle_amount = -np.sign(theta) * np.exp(

@@ -56,11 +56,11 @@ class Simulator:
         """Construct forces"""
         force_list = [
             forces.DesiredForce(),
-            # forces.SocialForce(),
+            forces.SocialForce(),
             forces.ObstacleForce(),
             forces.PedRepulsiveForce(),
             # forces.SpaceRepulsiveForce(),
-            forces.GoalAttractiveForce()
+            # forces.GoalAttractiveForce()
         ]
         group_forces = [
             # forces.GroupCoherenceForceAlt(),
