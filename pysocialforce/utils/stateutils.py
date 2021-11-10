@@ -69,6 +69,7 @@ def desired_directions(state: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     return directions, dist
 
 
+
 @njit
 def vec_diff(vecs: np.ndarray) -> np.ndarray:
     """r_ab

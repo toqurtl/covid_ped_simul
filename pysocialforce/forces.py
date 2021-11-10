@@ -38,7 +38,7 @@ class Force(ABC):
     @abstractmethod
     def _get_force(self) -> np.ndarray:
         """Abstract class to get social forces
-            return: an array of force vectors for each pedestrians
+            return: an array of force vectors for each pede strians
         """
         raise NotImplementedError
 
