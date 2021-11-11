@@ -1,7 +1,8 @@
 """Field of view computation."""
 
 import numpy as np
-
+from pysocialforce.custom import utils
+from pysocialforce.utils import stateutils
 
 class FieldOfView(object):
     """Compute field of view prefactors.
@@ -34,4 +35,13 @@ class FieldOfView(object):
         out[in_sight] = 1.0
         
         np.fill_diagonal(out, 0.0)
+        
         return out
+
+    def new_call(self, peds, forces_direction):
+        desired_direction = peds.desired_directions()
+        in_sight = (
+            np.einsum("aj,abj->ab", desired_direction, forces_direction)
+            > np.linalg.norm(forces_direction, axis=-1) * self.cosphi
+        )
+        r_ab = stateutils.vec_diff(peds.state[:,:2])

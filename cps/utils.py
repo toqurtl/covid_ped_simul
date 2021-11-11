@@ -28,3 +28,6 @@ def get_num_of_peds_with_threshold(state, threshold):
         distance_mask = ped_distance < threshold
         num_list.append(len(ped_distance[distance_mask])-1)
     return num_list
+
+def field_of_view(state):
+    pass
