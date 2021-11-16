@@ -80,6 +80,10 @@ class Simulator:
         """compute forces"""            
         return sum(map(lambda x: x.get_force(), self.forces))
 
+    def compute_my_force(self):
+        
+        pass
+
     def get_states(self):
         """Expose whole state"""
         return self.peds.get_states()

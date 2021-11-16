@@ -68,6 +68,7 @@ class PedState:
     def step(self, force, groups=None):
         """Move peds according to forces"""
         # desired velocity
+        
         desired_velocity = self.vel() + self.step_width * force
         desired_velocity = self.capped_velocity(desired_velocity, self.max_speeds)
         # stop when arrived
@@ -128,6 +129,15 @@ class EnvState:
     def __init__(self, obstacles, resolution=10):
         self.resolution = resolution
         self.obstacles = obstacles
+        self.obstacles_line = obstacles
+        obstacles_min, obstacles_max = [], []
+        
+        for obstacle in obstacles:
+            obstacles_min.append([obstacle[0], obstacle[2]])
+            obstacles_max.append([obstacle[1], obstacle[3]])
+        self.obstacles_min = np.array(obstacles_min)
+        self.obstacles_max = np.array(obstacles_max)
+                        
 
     @property
     def obstacles(self) -> List[np.ndarray]:

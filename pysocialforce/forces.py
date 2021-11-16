@@ -7,7 +7,7 @@ import numpy as np
 from pysocialforce.potentials import PedPedPotential, PedSpacePotential
 from pysocialforce.fieldofview import FieldOfView
 from pysocialforce.utils import Config, stateutils, logger
-
+from pysocialforce.custom import utils
 
 def camel_to_snake(camel_case_string):
     """Convert CamelCase to snake_case"""
@@ -77,6 +77,7 @@ class PedRepulsiveForce(Force):
         fov = FieldOfView(phi=self.config("fov_phi"), out_of_view_factor=self.config("fov_factor"),)
         
         w = np.expand_dims(fov(self.peds.desired_directions(), -f_ab), -1)        
+        
         F_ab = w * f_ab
         return np.sum(F_ab, axis=1) * self.factor
 
@@ -245,7 +246,7 @@ class DesiredForce(Force):
         force[dist > goal_threshold] = (
             direction * self.peds.max_speeds.reshape((-1, 1)) - vel.reshape((-1, 2))
         )[dist > goal_threshold, :]
-        force[dist <= goal_threshold] = -1.0 * vel[dist <= goal_threshold]
+        force[dist <= goal_threshold] = -1.0 * vel[dist <= goal_threshold]        
         force /= relexation_time
         return force * self.factor
 
@@ -274,6 +275,7 @@ class SocialForce(Force):
         
         # compute interaction direction t_ij
         interaction_vec = lambda_importance * vel_diff + diff_direction
+        
         interaction_direction, interaction_length = stateutils.normalize(interaction_vec)
 
         # compute angle theta (between interaction and position difference vector)
@@ -310,7 +312,7 @@ class ObstacleForce(Force):
         force = np.zeros((self.peds.size(), 2))
         if len(self.scene.get_obstacles()) == 0:
             return force
-        obstacles = np.vstack(self.scene.get_obstacles())
+        obstacles = np.vstack(self.scene.get_obstacles())        
         pos = self.peds.pos()
 
         for i, p in enumerate(pos):
@@ -324,3 +326,8 @@ class ObstacleForce(Force):
             force[i] = np.sum(directions[dist_mask], axis=0)
 
         return force * self.factor
+
+class Myforce(Force):
+
+    def _get_force(self):
+        filt = utils.field_of_view(self.peds, self.scene.env)
