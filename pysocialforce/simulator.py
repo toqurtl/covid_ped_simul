@@ -7,6 +7,7 @@ See Helbing and Molnár 1998 and Moussaïd et al. 2010
 from pysocialforce.utils import DefaultConfig
 from pysocialforce.scene import PedState, EnvState
 from pysocialforce import forces
+import time
 
 
 class Simulator:
@@ -50,13 +51,16 @@ class Simulator:
         self.peds = PedState(state, groups, self.config)
 
         # construct forces
+        self.myforce = forces.Myforce()
+        self.myforce.init(self, self.config)
         self.forces = self.make_forces(self.config)
+        
 
     def make_forces(self, force_configs):
         """Construct forces"""
         force_list = [
             forces.DesiredForce(),
-            forces.SocialForce(),
+            # forces.SocialForce(),
             forces.ObstacleForce(),
             forces.PedRepulsiveForce(),
             # forces.SpaceRepulsiveForce(),
@@ -77,12 +81,14 @@ class Simulator:
         return force_list
 
     def compute_forces(self):
-        """compute forces"""            
-        return sum(map(lambda x: x.get_force(), self.forces))
+        """compute forces"""
+        basic_force = sum(map(lambda x: x.get_force(), self.forces))        
+        my_force = self.compute_my_force()        
+        return basic_force + my_force
 
-    def compute_my_force(self):
+    def compute_my_force(self):        
+        return self.myforce.get_force()
         
-        pass
 
     def get_states(self):
         """Expose whole state"""

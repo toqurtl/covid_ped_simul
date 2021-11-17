@@ -36,10 +36,11 @@ if __name__ == "__main__":
     #         print('not inter')
     # exit()
     # initial states, each entry is the position, velocity and goal of a pedestrian in the form of (px, py, vx, vy, gx, gy)
+    # add(alpha, beta)
     initial_state = np.array(
         [
-            [0.0, 10, -0.5, -0.5, 0.0, 0.0],
-            [0.5, 10, -0.5, -0.5, 0.5, 0.0],
+            [0.0, 20, -0.5, -0.5, 0.0, 0.0],
+            [0.5, 20, -0.5, -0.5, 0.5, 0.0],
             [0, 0.0, 0.0, 0.5, 1.0, 10.0],
             [0.5, 0.0, 0.0, 0.5, 1.0, 10.0],
             # [1.0, 0.0, 0.0, 0.5, 2.0, 10.0],
@@ -50,7 +51,7 @@ if __name__ == "__main__":
     # social groups informoation is represented as lists of indices of the state array
     groups = [[0], [1], [2]]
     # list of linear obstacles given in the form of (x_min, x_max, y_min, y_max)
-    obs = [[-1, -1, -1, 11], [3, 3, -1, 11], [2,3,3,4]]
+    obs = [[-1, -1, -1, 11], [3, 3, -1, 11]]
     # obs = [[1, 2, 7, 8]]
     # obs = None
     # initiate the simulator,

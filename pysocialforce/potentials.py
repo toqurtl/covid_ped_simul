@@ -37,10 +37,6 @@ class PedPedPotential(object):
 
     def value_r_ab(self, r_ab, speeds, desired_directions):
         """Value of potential explicitly parametrized with r_ab."""
-        print(r_ab)
-        print(np.exp(-self.b(r_ab, speeds, desired_directions)))
-        exit()
-        
         return self.v0 * np.exp(-self.b(r_ab, speeds, desired_directions) / self.sigma)
 
     @staticmethod
