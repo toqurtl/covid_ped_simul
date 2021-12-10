@@ -62,7 +62,7 @@ class Simulator:
             forces.DesiredForce(),
             # forces.SocialForce(),
             forces.ObstacleForce(),
-            forces.PedRepulsiveForce(),
+            # forces.PedRepulsiveForce(),
             # forces.SpaceRepulsiveForce(),
             # forces.GoalAttractiveForce()
         ]
