@@ -329,8 +329,8 @@ class ObstacleForce(Force):
 
 class Myforce(Force):
     def _get_force(self):
-        fov = CustomUtils.field_of_view(self.peds, self.scene.env)
-        desired_direction = self.peds.desired_directions()
+        # fov = CustomUtils.field_of_view(self.peds, self.scene.env)
+        # desired_direction = self.peds.desired_directions()
         distance_mat = CustomUtils.get_distance_matrix(self.peds)        
         desired_social_distance = self.peds.state[:, -1:]
         
@@ -344,5 +344,5 @@ class Myforce(Force):
         term_2 = 0 + (1-0)*(1 + angle_matrix)/2
         term = term_1 * term_2 * in_desired_distance
         term = np.repeat(np.expand_dims(term, axis=2), 2, axis=2)
-        e_ij = CustomUtils.ped_directions(self.peds)                
+        e_ij = CustomUtils.ped_directions(self.peds)   
         return np.sum(e_ij * term, axis=1)
