@@ -1,5 +1,7 @@
 numpy>=1.19
+pandas
 toml>=0.10
 numba>=0.51
 scipy>=1.5
 matplotlib
+pomegranate
