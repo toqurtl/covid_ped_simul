@@ -54,6 +54,7 @@ class Simulator:
         self.myforce = forces.Myforce()
         self.myforce.init(self, self.config)
         self.forces = self.make_forces(self.config)
+        self.time_step = 0
         
 
     def make_forces(self, force_configs):
@@ -64,7 +65,7 @@ class Simulator:
             forces.ObstacleForce(),
             # forces.PedRepulsiveForce(),
             # forces.SpaceRepulsiveForce(),
-            # forces.GoalAttractiveForce()
+            # forces.GoalAttractiveForce(),            
         ]
         group_forces = [
             # forces.GroupCoherenceForceAlt(),
@@ -103,7 +104,11 @@ class Simulator:
 
     def step_once(self):
         """step once"""
+        print(self.peds.max_speeds.shape)
+        print(self.peds.state.shape)
         self.peds.step(self.compute_forces())
+        self.time_step += 1
+        self.peds.time_step += 1
         
 
     def step(self, n=1):

@@ -24,8 +24,6 @@ class FieldOfView(object):
         desired_direction : e, rank 2 and normalized in the last index.
         forces_direction : f, rank 3 tensor.
         """
-
-        
         in_sight = (
             np.einsum("aj,abj->ab", desired_direction, forces_direction)
             > np.linalg.norm(forces_direction, axis=-1) * self.cosphi
@@ -38,10 +36,3 @@ class FieldOfView(object):
         
         return out
 
-    def new_call(self, peds, forces_direction):
-        desired_direction = peds.desired_directions()
-        in_sight = (
-            np.einsum("aj,abj->ab", desired_direction, forces_direction)
-            > np.linalg.norm(forces_direction, axis=-1) * self.cosphi
-        )
-        r_ab = stateutils.vec_diff(peds.state[:,:2])

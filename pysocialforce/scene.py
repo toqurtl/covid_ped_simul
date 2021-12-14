@@ -2,9 +2,10 @@
 from typing import List
 
 import numpy as np
-
 from pysocialforce.utils import stateutils
-
+from pysocialforce.custom.utils import CustomUtils
+from cps.bayesian.model import BayesianModel
+from pysocialforce.custom.simulator import add_agent
 
 class PedState:
     """Tracks the state of pedstrains and social groups"""
@@ -21,6 +22,8 @@ class PedState:
         self.ped_states = []
         self.group_states = []
 
+        self.time_step = 0
+
         self.update(state, groups)
 
     def update(self, state, groups):
@@ -34,7 +37,7 @@ class PedState:
     @state.setter
     def state(self, state):
         tau = self.default_tau * np.ones(state.shape[0])
-        if state.shape[1] < 7:
+        if state.shape[1] < 9:
             self._state = np.concatenate((state, np.expand_dims(tau, -1)), axis=-1)
         else:
             self._state = state
@@ -58,8 +61,11 @@ class PedState:
     def goal(self) -> np.ndarray:
         return self.state[:, 4:6]
 
+    def visible(self):
+        return self.state[7:8]
+
     def tau(self):
-        return self.state[:, 6:7]
+        return self.state[:, 9:10]
 
     def speeds(self):
         """Return the speeds corresponding to a given state."""
@@ -81,6 +87,9 @@ class PedState:
         next_groups = self.groups
         if groups is not None:
             next_groups = groups
+        
+        if self.time_step == 20:
+            next_state = add_agent(next_state, np.array([[3.0, 0.0, 0.0, 0.5, 4.0, 10.0, 2, 1, 3]]))
         self.update(next_state, next_groups)
 
     # def initial_speeds(self):
@@ -92,6 +101,7 @@ class PedState:
     @staticmethod
     def capped_velocity(desired_velocity, max_velocity):
         """Scale down a desired velocity to its capped speed."""
+        
         desired_speeds = np.linalg.norm(desired_velocity, axis=-1)
         factor = np.minimum(1.0, max_velocity / desired_speeds)
         factor[desired_speeds == 0] = 0.0
@@ -121,6 +131,24 @@ class PedState:
             if index in group:
                 return i
         return -1
+
+    # add_function
+    def distance_matrix(self):
+        return CustomUtils.get_distance_matrix(self)     
+
+    def angle_matrix(self):
+        return CustomUtils.get_angle_matrix(self)
+
+    def desired_social_distance(self):
+        return self.peds.state[:, -1:]  
+
+    def in_desired_distance(self):
+        distance_mat = self.distance_matrix(self)
+        desired_social_distance = self.state[:, -1:]        
+        in_desired_distance = distance_mat < desired_social_distance
+        np.fill_diagonal(in_desired_distance, False)
+        in_desired_distance = in_desired_distance.astype(int)
+        return in_desired_distance
 
 
 class EnvState:
