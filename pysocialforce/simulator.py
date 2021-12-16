@@ -9,41 +9,27 @@ from pysocialforce.scene import PedState, EnvState
 from pysocialforce import forces
 import time
 
+# 시뮬레이션 전체과정을 처리
+# step 하나를 처리하는 모듈 => Scene의 PedState 클래스
+# step이 끝나면 결과를 저장하는 모듈 => record
+# step 이전 바뀌는 외부상황을 반영하는 모듈 => inspector
+## 새로운 ped 추가나 사라지는 ped 판단
+## 추가: self.basic_state를 관찰
+## 사라짐: 
 
 class Simulator:
-    """Simulate social force model.
-
-    ...
-
-    Attributes
-    ----------
-    state : np.ndarray [n, 6] or [n, 7]
-       Each entry represents a pedestrian state, (x, y, v_x, v_y, d_x, d_y, [tau])
-    obstacles : np.ndarray
-        Environmental obstacles
-    groups : List of Lists
-        Group members are denoted by their indices in the state
-    config : Dict
-        Loaded from a toml config file
-    max_speeds : np.ndarray
-        Maximum speed of pedestrians
-    forces : List
-        Forces to factor in during navigation
-
-    Methods
-    ---------
-    capped_velocity(desired_velcity)
-        Scale down a desired velocity to its capped speed
-    step()
-        Make one step
-    """
 
     def __init__(self, state, groups=None, obstacles=None, config_file=None):
+        # Config 읽어보는 부분 -> 제일 마지막에 대대적으로 수정 ㄱ
         self.config = DefaultConfig()
         if config_file:
             self.config.load_config(config_file)
         # TODO: load obstacles from config
         self.scene_config = self.config.sub_config("scene")
+
+        # 시뮬레이션 전체를 관장하는 것
+        self.basic_state = state
+
         # initiate obstacles
         self.env = EnvState(obstacles, self.config("resolution", 10.0))
 
@@ -53,7 +39,7 @@ class Simulator:
         # construct forces
         self.myforce = forces.Myforce()
         self.myforce.init(self, self.config)
-        self.forces = self.make_forces(self.config)
+        self.forces = self.make_forces(self.config)        
         self.time_step = 0
         
 
@@ -65,7 +51,8 @@ class Simulator:
             forces.ObstacleForce(),
             # forces.PedRepulsiveForce(),
             # forces.SpaceRepulsiveForce(),
-            # forces.GoalAttractiveForce(),            
+            # forces.GoalAttractiveForce(), 
+            forces.Myforce()           
         ]
         group_forces = [
             # forces.GroupCoherenceForceAlt(),
@@ -83,14 +70,9 @@ class Simulator:
 
     def compute_forces(self):
         """compute forces"""
-        basic_force = sum(map(lambda x: x.get_force(), self.forces))        
-        my_force = self.compute_my_force()        
-        return basic_force + my_force
-
-    def compute_my_force(self):        
-        return self.myforce.get_force()
+        basic_force = sum(map(lambda x: x.get_force(), self.forces))      
+        return basic_force
         
-
     def get_states(self):
         """Expose whole state"""
         return self.peds.get_states()
@@ -104,15 +86,18 @@ class Simulator:
 
     def step_once(self):
         """step once"""
-        print(self.peds.max_speeds.shape)
-        print(self.peds.state.shape)
         self.peds.step(self.compute_forces())
         self.time_step += 1
         self.peds.time_step += 1
         
-
     def step(self, n=1):
         """Step n time"""
         for _ in range(n):
             self.step_once()
         return self
+
+    def set_step_width(self, step_width):
+        self.peds.step_width = step_width
+
+    def set_ped_states(self):
+        pass

@@ -115,29 +115,29 @@ class SceneVisualizer:
         self.ax.legend()
         return self.fig
     
-    def plot_gt(self, gt_data):
-        self.plot_obstacles()
-        groups = self.group_states[0]  # static group for now
-        if not groups:
-            for ped in range(self.scene.peds.size()):
-                x = self.states[:, ped, 0]
-                y = self.states[:, ped, 1]
-                self.ax.plot(x, y, "-o", label=f"ped {ped}", markersize=2.5)
-                break
+    # def plot_gt(self, gt_data):
+    #     self.plot_obstacles()
+    #     groups = self.group_states[0]  # static group for now
+    #     if not groups:
+    #         for ped in range(self.scene.peds.size()):
+    #             x = self.states[:, ped, 0]
+    #             y = self.states[:, ped, 1]
+    #             self.ax.plot(x, y, "-o", label=f"ped {ped}", markersize=2.5)
+    #             break
                         
             
-        else:
+    #     else:
 
-            colors = plt.cm.rainbow(np.linspace(0, 1, len(groups)))
+    #         colors = plt.cm.rainbow(np.linspace(0, 1, len(groups)))
 
-            for i, group in enumerate(groups):
-                for ped in group:
-                    x = self.states[:, ped, 0]
-                    y = self.states[:, ped, 1]
-                    self.ax.plot(x, y, "-o", label=f"ped {ped}", markersize=2.5, color=colors[i])            
-        self.ax.legend()
+    #         for i, group in enumerate(groups):
+    #             for ped in group:
+    #                 x = self.states[:, ped, 0]
+    #                 y = self.states[:, ped, 1]
+    #                 self.ax.plot(x, y, "-o", label=f"ped {ped}", markersize=2.5, color=colors[i])            
+    #     self.ax.legend()
 
-        return self.fig
+    #     return self.fig
 
     def animate(self):
         """Main method to create animation"""
@@ -203,10 +203,12 @@ class SceneVisualizer:
         """
         states, _ = self.scene.get_states()
         current_state = states[step]
+        
         # radius = 0.2 + np.linalg.norm(current_state[:, 2:4], axis=-1) / 2.0 * 0.3
-        radius = [0.2] * current_state.shape[0]
+        radius = [0.2] * current_state.shape[0]        
         if self.human_actors:
-            for i, human in enumerate(self.human_actors):
+            for i, human in enumerate(self.human_actors):  
+                # print(current_state[i,:2])              
                 human.center = current_state[i, :2]
                 human.set_radius(0.2)
                 # human.set_radius(radius[i])

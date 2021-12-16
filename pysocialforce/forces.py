@@ -11,7 +11,6 @@ from pysocialforce.custom.utils import CustomUtils
 
 def camel_to_snake(camel_case_string):
     """Convert CamelCase to snake_case"""
-
     return re.sub(r"(?<!^)(?=[A-Z])", "_", camel_case_string).lower()
 
 
@@ -27,7 +26,7 @@ class Force(ABC):
 
     def init(self, scene, config):
         """Load config and scene"""
-        # load the sub field corresponding to the force name from global confgi file
+        # load the sub field corresponding to the force name from global confgi file        
         self.config = config.sub_config(camel_to_snake(type(self).__name__))
         if self.config:
             self.factor = self.config("factor", 1.0)
@@ -38,7 +37,7 @@ class Force(ABC):
     @abstractmethod
     def _get_force(self) -> np.ndarray:
         """Abstract class to get social forces
-            return: an array of force vectors for each pede strians
+            return: an array of force vectors for each pedestrians
         """
         raise NotImplementedError
 
@@ -53,9 +52,9 @@ class GoalAttractiveForce(Force):
     """accelerate to desired velocity"""
 
     def _get_force(self):
+        print(-1.0/self.peds.tau())
         F0 = (
-            -1.0
-            / self.peds.tau()
+            1.0 / self.peds.tau()
             * (
                 np.expand_dims(self.peds.initial_speeds, -1) * self.peds.desired_directions()
                 - self.peds.vel()
