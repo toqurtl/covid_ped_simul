@@ -1,6 +1,6 @@
 {
-    "1":{
-        "id": 1,
+    "0":{
+        "id": 0,
         "px": -4.8270,
         "py": 1.3449,
         "vx": 0.8803,
@@ -9,10 +9,12 @@
         "gy": 15,        
         "distancing": 2,
         "start_time": 0,
-        "tau":0.5
+        "visible": 1,           
+        "tau":0.5,
+        "finished": 0
     },
-    "2":{
-        "id": 2,
+    "1":{
+        "id": 1,
         "px": -1.8691,
         "py": 13.9276,
         "vx": 0.0873,
@@ -21,10 +23,12 @@
         "gy": -5,
         "distancing": 2,
         "start_time": 0,
-        "tau":0.5
+        "visible": 1,
+        "tau":0.5,
+        "finished": 0
     },
-    "3":{
-        "id": 0,
+    "2":{
+        "id": 2,
         "px": 0,
         "py": 0,
         "vx": 0.5,
@@ -33,6 +37,8 @@
         "gy": 10,
         "distancing": 2,
         "start_time": 20,
-        "tau":0.5
+        "visible": 0,
+        "tau":0.5,
+        "finished": 0
     }
 }

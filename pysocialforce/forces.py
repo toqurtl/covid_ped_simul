@@ -51,8 +51,7 @@ class Force(ABC):
 class GoalAttractiveForce(Force):
     """accelerate to desired velocity"""
 
-    def _get_force(self):
-        print(-1.0/self.peds.tau())
+    def _get_force(self):        
         F0 = (
             1.0 / self.peds.tau()
             * (

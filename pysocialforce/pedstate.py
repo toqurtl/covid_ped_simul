@@ -6,14 +6,12 @@ from pysocialforce.custom.utils import CustomUtils
 from cps.bayesian.model import BayesianModel
 from pysocialforce.custom.inspector import add_agent
 
-"""state
-[px, py, vx, vy, ]
-"""
+"""계산기로 변경"""
 
 class PedState:
     """Tracks the state of pedstrains and social groups"""
 
-    def __init__(self, state, groups, config):
+    def __init__(self, config):
         self.default_tau = config("tau", 0.5)
         self.step_width = config("step_width", 0.133)
         self.agent_radius = config("agent_radius", 0.35)
@@ -22,34 +20,23 @@ class PedState:
         self.max_speeds = None
         self.initial_speeds = None
 
+        self.current_state = None
+
         self.ped_states = []
         self.group_states = []
 
         self.time_step = 0
+        # self.update(state, groups)
 
-        self.update(state, groups)
-
-    def update(self, state, groups):
-        self.state = state
+    def set_state(self, state, groups):
+        self.current_state = state               
+        self.initial_speeds = self.speeds()        
+        self.max_speeds = self.max_speed_multiplier * self.initial_speeds        
         self.groups = groups
-
+    
     @property
     def state(self):
-        return self._state
-
-    @state.setter
-    def state(self, state):
-        tau = self.default_tau * np.ones(state.shape[0])
-        if state.shape[1] < 9:
-            self._state = np.concatenate((state, np.expand_dims(tau, -1)), axis=-1)
-        else:
-            self._state = state
-
-        if self.initial_speeds is None:            
-            self.initial_speeds = self.speeds()
-        
-        self.max_speeds = self.max_speed_multiplier * self.initial_speeds
-        self.ped_states.append(self._state.copy())
+        return self.current_state
 
     def get_states(self):
         return np.stack(self.ped_states), self.group_states
@@ -92,11 +79,21 @@ class PedState:
         if groups is not None:
             next_groups = groups
         
-        # if self.time_step == 20:            
-        #     next_state, speed = add_agent(next_state, np.array([[3.0, 0.0, 0.0, 0.5, 4.0, 10.0, 2, 1, 3]]))
-        #     self.initial_speeds = speed
-
         self.update(next_state, next_groups)
+
+    def new_step(self, force, visible_state, group_state=None):
+        # desired velocity
+        desired_velocity = self.vel() + self.step_width * force
+        desired_velocity = self.capped_velocity(desired_velocity, self.max_speeds)
+        # stop when arrived
+        desired_velocity[stateutils.desired_directions(self.state)[1] < 0.5] = [0, 0]        
+        visible_state[:, 0:2] += desired_velocity * self.step_width        
+        visible_state[:, 2:4] = desired_velocity
+        
+        next_group_state = self.groups if group_state is None else group_state
+
+        return visible_state, next_group_state
+        
 
     # def initial_speeds(self):
     #     return stateutils.speeds(self.ped_states[0])
