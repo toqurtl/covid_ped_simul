@@ -21,7 +21,6 @@ def added_agent(states: np.ndarray, time_step):
 
 def check_start_time(states: np.ndarray, start_schedule: np.ndarray):
     a = start_schedule.reshape(-1, 1)    
-    
 
 
 def add_agent(existing_state, new_state: np.ndarray):

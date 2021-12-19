@@ -1,4 +1,3 @@
-from pysocialforce.custom.inspector import visible_peds
 from .parameters import DataIndex as Index
 # json파일 형식 체크하는 함수
 

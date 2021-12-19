@@ -241,6 +241,7 @@ class DesiredForce(Force):
         goal = self.peds.goal()
         direction, dist = stateutils.normalize(goal - pos)
         force = np.zeros((self.peds.size(), 2))
+        
         force[dist > goal_threshold] = (
             direction * self.peds.max_speeds.reshape((-1, 1)) - vel.reshape((-1, 2))
         )[dist > goal_threshold, :]

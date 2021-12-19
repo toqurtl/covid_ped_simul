@@ -1,18 +1,12 @@
 # coding=utf-8
-
-"""Synthetic pedestrian behavior with social groups simulation according to the Extended Social Force model.
-
-See Helbing and Molnár 1998 and Moussaïd et al. 2010
-"""
 from pysocialforce.utils import DefaultConfig
 # from pysocialforce.scene import PedState, EnvState
-from pysocialforce.scene import EnvState
+from pysocialforce.envstate import EnvState
 from pysocialforce.pedstate import PedState
 from pysocialforce import forces
 from pysocialforce.data.peds import Pedestrians
-import time
+from pysocialforce.update_manager import UpdateManager
 import numpy as np
-from pysocialforce.data.parameters import DataIndex as Index
 
 # 시뮬레이션 전체과정을 처리
 # step 하나를 처리하는 모듈 => Scene의 PedState 클래스
@@ -24,7 +18,7 @@ from pysocialforce.data.parameters import DataIndex as Index
 
 class NewSimulator(object):
 
-    def __init__(self, peds_info: Pedestrians, groups=None, obstacles=None, config_file=None):
+    def __init__(self, peds_info: Pedestrians, groups=None, obstacles=None, time_table=None, config_file=None):
         # Config 읽어보는 부분 -> 제일 마지막에 대대적으로 수정 ㄱ
         self.config = DefaultConfig()
         if config_file:
@@ -38,9 +32,15 @@ class NewSimulator(object):
         self.peds = PedState(self.config)
         self.env = EnvState(obstacles, self.config("resolution", 10.0))
 
+        self.time_table = time_table
         self._initialize_force()
+        self._initialize()
         return
 
+    def _initialize(self):
+        speed_vecs = self.peds_info.current_state[:,2:4]
+        self.initial_speeds = np.array([np.linalg.norm(s) for s in speed_vecs])        
+        self.max_speeds = self.peds.max_speed_multiplier * self.initial_speeds
 
     def _initialize_force(self):        
         force_list = [
@@ -58,6 +58,15 @@ class NewSimulator(object):
         self.forces = force_list
         return
     
+    def set_step_width(self):
+        if self.time_table is None:
+            self.peds.step_width = 0.133            
+        else:
+            try: 
+                self.peds.step_width = self.time_table[self.time_step]                
+            except IndexError:
+                self.peds.step_width = 0.133            
+
     def compute_forces(self):
         return sum(map(lambda x: x.get_force(), self.forces))
     
@@ -69,50 +78,65 @@ class NewSimulator(object):
     def get_obstacles(self):
         return self.env.obstacles
 
-    def set_step_width(self, step_width):
-        self.peds.step_width = step_width
-
-    def update_visible(self):
-        pass
-
-
     """시뮬레이션 함수"""
+    def simulate(self):
+        while True:
+            # self.set_step_width()
+            is_finished = self.step_once()            
+            if is_finished:
+                break            
+        return
 
     def step_once(self):
-        # update_visible
-        whole_state, visible_state = self.before_step()
-        next_state, next_group_state = self.do_step(visible_state, None)
+        # update_visible        
+        whole_state = self.peds_info.current_state.copy()        
+        whole_state = UpdateManager.update_finished(whole_state)
+        # whole_state = UpdateManager.update_visible(whole_state, self.time_step)        
+        visible_state = UpdateManager.get_visible(whole_state)
+        visible_idx = UpdateManager.get_visible_idx(whole_state)
+        visible_max_speeds = self.max_speeds[visible_idx]
+        if self.check_finish():
+            return True
+        next_group_state = None
         
-        id_index = visible_state[:, Index.id.index].astype(np.int64)
-        whole_state[id_index] = visible_state
-        is_updated = self.after_step(whole_state, next_group_state)        
-        # new_state 구하는 과정에서 에러가 없는지 확인하고 업데이트 수행
-    
-    def before_step(self):
-        # visible state를 pool에서 뽑음        
-        visible_state = self.peds_info.visible_state_at(self.time_step)        
-        return visible_state
+        if len(visible_state) > 0:
+            # 계산 결과를 반영하고
+            next_state, next_group_state = self.do_step(visible_state, visible_max_speeds, None)
+            whole_state = UpdateManager.new_state(whole_state, next_state)
+
+        # 계산안하고 등장해야 하는 애들 반영        
+        whole_state = UpdateManager.update_new_peds(whole_state, self.time_step)
+        print(self.time_step)
+        print(whole_state[0])
+        if self.time_step == 150:
+            exit()
+        # print(self.peds.step_width)
+        
+        # 결과 저장
+        is_updated = self.after_step(whole_state, next_group_state)
+        if is_updated:            
+            self.peds.time_step += 1
+            self.time_step += 1
+            return False
+        else:
+            print("update failed")
+            return True
 
     # calculate social force and make result
     # visible state + force -> new_state
-    def do_step(self, visible_state, visible_group=None):                
-        self.peds.set_state(visible_state, visible_group)
+    def do_step(self, visible_state, visible_max_speeds, visible_group=None):        
+        self.peds.set_state(visible_state, visible_group, visible_max_speeds)
         force = self.compute_forces()        
-        next_state, next_group_state = self.peds.new_step(force, visible_state)        
+        next_state, next_group_state = self.peds.step(force, visible_state)
         return next_state, next_group_state
 
     # result to data
     def after_step(self, next_state, next_group_state):
-        is_updated = self.peds_info.update(next_state, self.time_step)
-        if is_updated:            
-            self.peds.time_step += 1
-            self.time_step += 1
-        else:
-            print("Problem at simulation time:", self.time_step)
+        is_updated = self.peds_info.update(next_state, self.time_step)        
         return is_updated
 
-    def check_finish(self):
-        return np.sum(self.peds_info.visible_dis_condition(self.peds_info.current_state)) == 0
+    def check_finish(self):        
+        return np.sum(self.peds_info.check_finished())
 
         
     

@@ -31,7 +31,7 @@ class PedAgent(object):
         return self.states[time_step]
     
     """ state 추가"""
-    def update(self, new_whole_state, time_step):           
+    def update(self, new_whole_state):           
         new_state = new_whole_state[self.id]
         return True, np.squeeze(new_state)
 
@@ -72,13 +72,3 @@ class PedAgent(object):
     @property
     def finished(self):
         return self.current_state[Index.finished.index]
-
-    def is_start(self, time_step):
-        return self.start_time <= time_step + 1
-
-    def is_finished(self, time_step):
-        return self.state_at(time_step)[Index.finished.index]
-
-
-    def is_visible(self, time_step):
-        return self.is_start(time_step) and not self.is_finished(time_step)

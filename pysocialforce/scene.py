@@ -44,6 +44,7 @@ class PedState:
 
         if self.initial_speeds is None:            
             self.initial_speeds = self.speeds()
+
         
         self.max_speeds = self.max_speed_multiplier * self.initial_speeds
         self.ped_states.append(self._state.copy())
@@ -140,25 +141,6 @@ class PedState:
             if index in group:
                 return i
         return -1
-
-    # add_function
-    def distance_matrix(self):
-        return CustomUtils.get_distance_matrix(self)     
-
-    def angle_matrix(self):
-        return CustomUtils.get_angle_matrix(self)
-
-    def desired_social_distance(self):
-        return self.peds.state[:, -1:]  
-
-    def in_desired_distance(self):
-        distance_mat = self.distance_matrix(self)
-        desired_social_distance = self.state[:, -1:]        
-        in_desired_distance = distance_mat < desired_social_distance
-        np.fill_diagonal(in_desired_distance, False)
-        in_desired_distance = in_desired_distance.astype(int)
-        return in_desired_distance
-
 
 class EnvState:
     """State of the environment obstacles"""
