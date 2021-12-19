@@ -4,6 +4,8 @@ from pysocialforce.data.parameters import DataIndex as Index
 
 class UpdateManager(object):
     # check functions
+    
+
     @classmethod
     def is_started(cls, state: np.ndarray, time_step):
         return state[:, Index.start_time.index] <= time_step
@@ -28,11 +30,11 @@ class UpdateManager(object):
     # get_idx functions
     @classmethod
     def update_finished(cls, state: np.ndarray):
-        finish_cond = cls.is_finished(state)
+        finish_cond = cls.is_finished(state)        
         state[:, Index.finished.index] = finish_cond * 1
-        for data in state:
+        for idx, data in enumerate(state):  
             if data[Index.id.index] in cls.finished_idx(state):
-                data[Index.visible.index] = 0        
+                state[idx][Index.visible.index] = 0        
         return state
 
     @classmethod
@@ -43,8 +45,9 @@ class UpdateManager(object):
 
     @classmethod
     def update_new_peds(cls, state:np.ndarray, time_step):
-        start_time_cond = UpdateManager.is_started(state, time_step)
-        state[:, Index.visible.index] = start_time_cond * 1
+        for idx, data in enumerate(state):
+            if data[Index.id.index] in cls.start_idx(state, time_step):
+                state[idx][Index.visible.index] = 1
         return state
 
     @classmethod
@@ -57,6 +60,11 @@ class UpdateManager(object):
     def finished_idx(cls, state: np.ndarray):
         finished_peds = state[state[:, Index.finished.index] == 1]
         return finished_peds[:, Index.id.index].astype(np.int64)
+
+    @classmethod
+    def start_idx(cls, state: np.ndarray, time_step):
+        start_peds = state[state[:, Index.start_time.index] == time_step]
+        return start_peds[:, Index.id.index].astype(np.int64)
 
     # result_functions
     @classmethod

@@ -16,6 +16,9 @@ except ImportError:
 from .logging import logger
 from .stateutils import minmax
 
+from pysocialforce.new_simulator import NewSimulator
+from pysocialforce.data.parameters import DataIndex as Index
+
 
 @contextmanager
 def canvas(image_file=None, **kwargs):
@@ -64,14 +67,15 @@ class SceneVisualizer:
 
     def __init__(
         # self, scene, output=None, writer="imagemagick", cmap="viridis", agent_colors=None, **kwargs
-        self, scene, output=None, writer="PillowWriter", cmap="viridis", agent_colors=None, **kwargs
+        self, scene, simulator: NewSimulator,  output=None, writer="PillowWriter", cmap="viridis", agent_colors=None, **kwargs
     ):
         self.scene = scene
-        self.states, self.group_states = self.scene.get_states()
+        self.simulator = simulator        
+        self.states = np.array(self.simulator.peds_info.states)
+        self.group_states = self.simulator.peds_info.group_states
         self.cmap = cmap
         self.agent_colors = agent_colors
-        self.frames = self.scene.get_length()
-        print(self.frames)
+        self.frames = len(self.states)        
         self.output = output
         self.writer = writer
 
@@ -100,8 +104,9 @@ class SceneVisualizer:
         self.plot_obstacles()
         groups = self.group_states[0]  # static group for now
         if not groups:
-            for ped in range(self.scene.peds.size()):
-                x = self.states[:, ped, 0]
+            # for ped in range(self.scene.peds.size()):
+            for ped in range(0, len(self.states[0])):
+                x = self.states[:, ped, 0]                
                 y = self.states[:, ped, 1]
                 self.ax.plot(x, y, "-o", label=f"ped {ped}", markersize=2.5)
         else:
@@ -116,29 +121,6 @@ class SceneVisualizer:
         self.ax.legend()
         return self.fig
     
-    # def plot_gt(self, gt_data):
-    #     self.plot_obstacles()
-    #     groups = self.group_states[0]  # static group for now
-    #     if not groups:
-    #         for ped in range(self.scene.peds.size()):
-    #             x = self.states[:, ped, 0]
-    #             y = self.states[:, ped, 1]
-    #             self.ax.plot(x, y, "-o", label=f"ped {ped}", markersize=2.5)
-    #             break
-                        
-            
-    #     else:
-
-    #         colors = plt.cm.rainbow(np.linspace(0, 1, len(groups)))
-
-    #         for i, group in enumerate(groups):
-    #             for ped in group:
-    #                 x = self.states[:, ped, 0]
-    #                 y = self.states[:, ped, 1]
-    #                 self.ax.plot(x, y, "-o", label=f"ped {ped}", markersize=2.5, color=colors[i])            
-    #     self.ax.legend()
-
-    #     return self.fig
 
     def animate(self):
         """Main method to create animation"""
@@ -149,7 +131,7 @@ class SceneVisualizer:
             func=self.animation_update,
             frames=self.frames,
             blit=True,
-        )
+        )        
 
         return self.ani
 
@@ -202,51 +184,55 @@ class SceneVisualizer:
         :param step: index of state, default is the latest
         :return: list of patches
         """
-        states, _ = self.scene.get_states()
         
+        states = self.states
         current_state = states[step]
         
         # radius = 0.2 + np.linalg.norm(current_state[:, 2:4], axis=-1) / 2.0 * 0.3
-        radius = [0.2] * current_state.shape[0]        
+        radius = [0.2] * current_state.shape[0]            
         if self.human_actors:
-            for i, human in enumerate(self.human_actors):  
+            for i, human in enumerate(self.human_actors):                  
                 # print(current_state[i,:2])              
-                human.center = current_state[i, :2]
-                human.set_radius(0.2)
+                human.center = current_state[i, :2]                
+                if bool(current_state[i, Index.visible.index]):
+                    human.set_radius(0.2)
+                else:                    
+                    human.set_radius(0)
                 # human.set_radius(radius[i])
         else:
             self.human_actors = [
                 Circle(pos, radius=r) for pos, r in zip(current_state[:, :2], radius)
             ]
-        self.human_collection.set_paths(self.human_actors)
+        self.human_collection.set_paths(self.human_actors)        
         if not self.agent_colors:
-            self.human_collection.set_array(np.arange(current_state.shape[0]))
+            self.human_collection.set_array(np.arange(current_state.shape[0]))            
         else:
             # set colors for each agent
             assert len(self.human_actors) == len(
                 self.agent_colors
             ), "agent_colors must be the same length as the agents"
             self.human_collection.set_facecolor(self.agent_colors)
+        
 
     def plot_groups(self, step=-1):
         """Generate patches for groups
         :param step: index of state, default is the latest
         :return: list of patches
         """
-        states, group_states = self.scene.get_states()        
+        states, group_states = self.states, self.group_states
         current_state = states[step]
-        current_groups = group_states[step]        
+        current_groups = group_states[step]
         if self.group_actors:  # update patches, else create
             points = [current_state[g, :2] for g in current_groups]
             for i, p in enumerate(points):
                 self.group_actors[i].set_xy(p)
-        else:            
+        else:                
             self.group_actors = [Polygon(current_state[g, :2]) for g in current_groups]
 
         self.group_collection.set_paths(self.group_actors)
 
     def plot_obstacles(self):
-        for s in self.scene.get_obstacles():
+        for s in self.simulator.get_obstacles():
             self.ax.plot(s[:, 0], s[:, 1], "-o", color="black", markersize=1)
 
     def animation_init(self):
@@ -257,6 +243,6 @@ class SceneVisualizer:
         return (self.group_collection, self.human_collection)
 
     def animation_update(self, i):
-        self.plot_groups(i)
+        self.plot_groups(i)        
         self.plot_human(i)
         return (self.group_collection, self.human_collection)

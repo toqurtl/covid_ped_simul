@@ -6,7 +6,8 @@ from .parameters import DataIndex as Index
 class Pedestrians(object):
     def __init__(self, json_data):
         self.peds: Dict[int, PedAgent] = {}
-        self.states: List[np.ndarray] = []                
+        self.states: List[np.ndarray] = []
+        self.group_states = []            
         self._initialize(json_data)
     
     def _initialize(self, json_data):
@@ -14,8 +15,10 @@ class Pedestrians(object):
         for key, agent_data in json_data.items():
             ped = PedAgent(agent_data)
             self.peds[key] = ped
-            initial_state.append(ped.current_state)        
+            initial_state.append(ped.current_state)
+        
         self.states.append(np.array(initial_state))
+        self.group_states.append([])
         return
     
     @property
@@ -29,7 +32,7 @@ class Pedestrians(object):
     def state_at(self, time_step):
         return self.states[time_step]
 
-    def update(self, new_peds_state, time_step):
+    def update(self, new_peds_state, next_group_state, time_step):
         is_updated, new_state_list = 0, []
         for ped in self.peds.values():
             check, new_state = ped.update(new_peds_state)            
@@ -38,8 +41,13 @@ class Pedestrians(object):
 
         is_updated = is_updated == len(self.peds)
         
-        if is_updated:            
+        if is_updated:
+            if next_group_state is None:
+                self.group_states.append([])
+            else:    
+                self.group_states.append(next_group_state)
             self.states.append(np.array(new_state_list))
+            
         return is_updated
 
     def check_finished(self):

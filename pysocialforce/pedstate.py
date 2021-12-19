@@ -72,8 +72,10 @@ class PedState:
         desired_velocity[stateutils.desired_directions(self.state)[1] < 0.5] = [0, 0]        
         visible_state[:, 0:2] += desired_velocity * self.step_width        
         visible_state[:, 2:4] = desired_velocity
-        
-        next_group_state = self.groups if group_state is None else group_state
+        if group_state is None:
+            next_group_state = []
+        else:
+            next_groups_state = []        
 
         return visible_state, next_group_state
         

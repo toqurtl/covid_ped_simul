@@ -323,8 +323,8 @@ class ObstacleForce(Force):
             dist_mask = dist < threshold
             directions[dist_mask] *= np.exp(-dist[dist_mask].reshape(-1, 1) / sigma)
             force[i] = np.sum(directions[dist_mask], axis=0)
-
-        return force * self.factor
+        
+        return force * 1
 
 class Myforce(Force):
     def _get_force(self):
