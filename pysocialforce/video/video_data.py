@@ -77,10 +77,55 @@ class VideoData(object):
         time_step = self.time_table[start_idx]
         return (pos_2 - pos_1) / time_step
 
+
     def to_json(self, file_path):
         state = self.initial_state()
         with open(file_path, 'w') as f:
             json.dump(state, f, indent=4)
         return
         
+    def trajectory_to_json(self, file_path):
+        result_data = {}
+        
+
+        for time_idx, step_width in enumerate(self.time_table):
+            result_data[time_idx] = {}
+            states = []
+            for ped_idx in range(0, self.num_person):
+                state = [] 
+                x_data = self.x_origin[:, ped_idx+1]
+                start, finish = self.represent_time(x_data)              
+                px = self.x_origin[time_idx][ped_idx+1]
+                py = self.y_origin[time_idx][ped_idx+1]
+                if np.isnan(px):
+                    visible = 0
+                else:
+                    visible = 1
+                
+                if finish > time_idx:
+                    finish_value = 1
+                else:
+                    finish_value = 0
+                if visible == 1:
+                    state.append(px)
+                    state.append(py)
+                else:
+                    state.append(0)
+                    state.append(0)
+                for i in range(0, 6):
+                    state.append(0)
+                state.append(visible)
+                state.append(start)
+                state.append(ped_idx)
+                state.append(finish_value)
+                states.append(state)
+                
+            
+            result_data[time_idx] ={
+                "step_width": step_width,
+                "states": states
+            }        
+        with open(file_path, 'w') as f:
+            json.dump(result_data, f, indent=4)
+        return
     

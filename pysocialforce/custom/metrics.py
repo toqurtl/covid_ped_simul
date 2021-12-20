@@ -1,4 +1,9 @@
-def average_displacement_error(ped_states, ground_truth_data):
+def average_displacement_error(simul_data, gt_data):
+    num_person = len(simul_data[0]["states"])
+    simul_time = len(simul_data)
+    for data in simul_data:
+        pass
+    
     pass
 
 def final_displacement_error(ped_states, ground_truth_data):

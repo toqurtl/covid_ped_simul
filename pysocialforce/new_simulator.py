@@ -34,7 +34,7 @@ class NewSimulator(object):
         return
 
     def _initialize(self):
-        speed_vecs = self.peds_info.current_state[:,2:4]
+        speed_vecs = self.peds_info.current_state[:,2:4]        
         self.initial_speeds = np.array([np.linalg.norm(s) for s in speed_vecs])        
         self.max_speeds = self.peds.max_speed_multiplier * self.initial_speeds
 
