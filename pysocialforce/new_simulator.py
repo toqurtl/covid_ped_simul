@@ -80,16 +80,20 @@ class NewSimulator(object):
     """시뮬레이션 함수"""
     def simulate(self):
         while True:            
-            is_finished = self.step_once()            
+            is_finished = self.step_once()
+
             if is_finished: 
                 break
             
+            if self.time_step>300:
+                break
         return
 
     def step_once(self):
         # update_visible        
         whole_state = self.peds_info.current_state.copy()        
         whole_state = UpdateManager.update_finished(whole_state)
+
         # whole_state = UpdateManager.update_visible(whole_state, self.time_step)        
         visible_state = UpdateManager.get_visible(whole_state)        
                 
@@ -104,11 +108,9 @@ class NewSimulator(object):
             # 계산 결과를 반영하고
             next_state, next_group_state = self.do_step(visible_state, visible_max_speeds, None)            
             whole_state = UpdateManager.new_state(whole_state, next_state)
-
         
         # 계산안하고 등장해야 하는 애들 반영        
-        whole_state = UpdateManager.update_new_peds(whole_state, self.time_step)                
-        # print(self.peds.step_width)
+        whole_state = UpdateManager.update_new_peds(whole_state, self.time_step)                        
         
         # 결과 저장        
         is_updated = self.after_step(whole_state, next_group_state)
@@ -124,7 +126,8 @@ class NewSimulator(object):
     # visible state + force -> new_state
     def do_step(self, visible_state, visible_max_speeds, visible_group=None):        
         self.peds.set_state(visible_state, visible_group, visible_max_speeds)
-        force = self.compute_forces()        
+        print(self.time_step)
+        force = self.compute_forces()              
         next_state, next_group_state = self.peds.step(force, visible_state)                
         return next_state, next_group_state
 

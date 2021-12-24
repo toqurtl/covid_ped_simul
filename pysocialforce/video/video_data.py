@@ -25,6 +25,55 @@ class VideoData(object):
     def time_table(self):
         return np.diff(self.x_origin[:,0])/1000
 
+    @property
+    def pos_x(self):
+        return self.x_origin[:, 1:]
+
+    @property
+    def pos_y(self):
+        return self.y_origin[:, 1:]
+
+    @property
+    def position_vec(self):
+        return np.stack((self.x_origin[:, 1:],self.y_origin[:, 1:]), axis=-1)
+
+    @property
+    def velocity_vec(self):
+        time = np.stack((self.time_table, self.time_table), axis=-1)
+        time = np.expand_dims(time, axis=1)
+        return np.diff(self.position_vec, axis=0) / time
+
+    # 한 장면만 나온 경우 문제 생김(데이터 검사할 때 필요)
+    @property
+    def initial_direction(self):
+        directions = []    
+        for person_idx in range(0, self.num_person):
+            start_index = self.start_time_array[person_idx]
+            start_pos = self.position_vec[start_index][person_idx]
+            next_pos = self.position_vec[start_index+1][person_idx]
+            directions.append(next_pos - start_pos)
+
+        return directions / np.expand_dims(np.linalg.norm(directions, axis=1), axis=1)
+
+    @property
+    def average_velocity(self):                
+        return np.nanmean(self.velocity_vec, axis=0)
+
+    @property
+    def initial_speed(self):
+        average_speed = np.linalg.norm(self.average_velocity, axis=1)        
+        return np.expand_dims(average_speed, axis=1) * self.initial_direction
+
+    @property
+    def start_time_array(self):
+        start_time_list = []
+        for person_idx in range(0, self.num_person):
+            start_time, _ = self.represent_time(self.pos_x[:, person_idx])
+            start_time_list.append(start_time)
+        return np.array(start_time_list)
+        
+
+
     def initial_state(self):
         state = {}
         for idx in range(0, self.num_person):            
@@ -33,8 +82,8 @@ class VideoData(object):
             state[idx]["id"] = idx
             state[idx]["px"] = self.initial_pos(x_data)
             state[idx]["py"] = self.initial_pos(y_data)
-            state[idx]["vx"] = self.initial_speed(x_data)
-            state[idx]["vy"] = self.initial_speed(y_data)
+            state[idx]["vx"] = self.initial_speed[idx][0]
+            state[idx]["vy"] = self.initial_speed[idx][1]
             state[idx]["gx"] = self.goal_pos(x_data)
             state[idx]["gy"] = self.goal_pos(y_data)
             state[idx]["distancing"] = 2
@@ -71,11 +120,8 @@ class VideoData(object):
         start_idx, finish_idx = self.represent_time(pos_data)
         return pos_data[finish_idx]
 
-    def initial_speed(self, pos_data):
-        start_idx, finish_idx = self.represent_time(pos_data)
-        pos_1, pos_2 = pos_data[start_idx], pos_data[start_idx+1]
-        time_step = self.time_table[start_idx]
-        return (pos_2 - pos_1) / time_step
+    def speed_at(self, pos_data):
+        print(np.average(pos_data[0:10]))
 
 
     def to_json(self, file_path):
@@ -87,7 +133,6 @@ class VideoData(object):
     def trajectory_to_json(self, file_path):
         result_data = {}
         
-
         for time_idx, step_width in enumerate(self.time_table):
             result_data[time_idx] = {}
             states = []

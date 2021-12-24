@@ -66,8 +66,8 @@ class PedState:
 
     def step(self, force, visible_state, group_state=None):
         # desired velocity
-        desired_velocity = self.vel() + self.step_width * force
-        desired_velocity = self.capped_velocity(desired_velocity, self.max_speeds)
+        desired_velocity = self.vel() + self.step_width * force        
+        desired_velocity = self.capped_velocity(desired_velocity, self.max_speeds)                
         # stop when arrived
         desired_velocity[stateutils.desired_directions(self.state)[1] < 0.5] = [0, 0]        
         visible_state[:, 0:2] += desired_velocity * self.step_width        

@@ -235,7 +235,7 @@ class DesiredForce(Force):
 
     def _get_force(self):
         relexation_time = self.config("relaxation_time", 0.5)
-        goal_threshold = self.config("goal_threshold", 0.1)
+        goal_threshold = self.config("goal_threshold", 0.5)
         pos = self.peds.pos()
         vel = self.peds.vel()
         goal = self.peds.goal()
@@ -324,7 +324,8 @@ class ObstacleForce(Force):
             directions[dist_mask] *= np.exp(-dist[dist_mask].reshape(-1, 1) / sigma)
             force[i] = np.sum(directions[dist_mask], axis=0)
         
-        return force * 1
+        # TODO- obstacle force가 너무 세면 목적지에 잘 가지 못하는 문제 발생
+        return force * 2
 
 class Myforce(Force):
     def _get_force(self):
