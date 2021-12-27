@@ -3,8 +3,6 @@ from typing import List
 
 import numpy as np
 from pysocialforce.utils import stateutils
-from pysocialforce.custom.utils import CustomUtils
-from cps.bayesian.model import BayesianModel
 from pysocialforce.custom.inspector import add_agent
 
 class PedState:

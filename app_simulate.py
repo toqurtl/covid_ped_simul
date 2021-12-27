@@ -46,7 +46,7 @@ s.simulate()
 
 s.result_to_json("data/result/"+idx+"/result_"+idx+".json")
 
-
+exit()
 # print(s.peds_info.states[-1][0])
 # exit()
 

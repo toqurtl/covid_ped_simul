@@ -148,9 +148,9 @@ class VideoData(object):
                     visible = 1
                 
                 if finish > time_idx:
-                    finish_value = 1
-                else:
                     finish_value = 0
+                else:
+                    finish_value = 1
                 if visible == 1:
                     state.append(px)
                     state.append(py)

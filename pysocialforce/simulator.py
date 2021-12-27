@@ -7,7 +7,6 @@ See Helbing and Molnár 1998 and Moussaïd et al. 2010
 from pysocialforce.utils import DefaultConfig
 from pysocialforce.scene import PedState, EnvState
 from pysocialforce import forces
-import time
 
 # 시뮬레이션 전체과정을 처리
 # step 하나를 처리하는 모듈 => Scene의 PedState 클래스
