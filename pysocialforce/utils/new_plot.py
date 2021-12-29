@@ -16,7 +16,7 @@ except ImportError:
 from .logging import logger
 from .stateutils import minmax
 
-from pysocialforce.new_simulator import NewSimulator
+from pysocialforce.simulator import NewSimulator
 from pysocialforce.data.parameters import DataIndex as Index
 
 

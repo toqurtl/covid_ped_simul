@@ -1,5 +1,5 @@
 import numpy as np
-from pysocialforce.new_simulator import NewSimulator
+from pysocialforce.simulator import NewSimulator
 import json
 from pysocialforce.data.peds import Pedestrians
 from pysocialforce.video.video_data import VideoData
