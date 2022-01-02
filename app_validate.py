@@ -5,15 +5,16 @@ from pysocialforce.video.result_data import ResultData
 
 idx = sys.argv[1]
 
+if len(sys.argv) > 2:
+    force_idx = sys.argv[2]
+else:
+    force_idx = 0
 
-gt_path = "data/result/"+idx+"/gt_"+idx+".json"
-origin_path = "data/result/"+idx+"/result_"+idx+".json"
+result_path = "data\\result\\"+idx+"_"+force_idx
 
+gt_path = result_path+"/gt_"+idx+".json"
+origin_path = result_path+"/result_"+idx+".json"
 
 result_data = ResultData(origin_path, gt_path)
 
-for person_idx in range(0, result_data.num_person):
-    print(result_data.ade_of_person(person_idx))
-
-print(result_data.ade_of_scene())
-
+print(result_data.risk_index_of_scene(2))

@@ -16,7 +16,7 @@ except ImportError:
 from .logging import logger
 from .stateutils import minmax
 
-from pysocialforce.simulator import NewSimulator
+from pysocialforce.simulator import Simulator
 from pysocialforce.data.parameters import DataIndex as Index
 
 
@@ -67,7 +67,7 @@ class SceneVisualizer:
 
     def __init__(
         # self, scene, output=None, writer="imagemagick", cmap="viridis", agent_colors=None, **kwargs
-        self, scene, simulator: NewSimulator,  output=None, writer="PillowWriter", cmap="viridis", agent_colors=None, **kwargs
+        self, scene, simulator: Simulator,  output=None, writer="PillowWriter", cmap="viridis", agent_colors=None, **kwargs
     ):
         self.scene = scene
         self.simulator = simulator        

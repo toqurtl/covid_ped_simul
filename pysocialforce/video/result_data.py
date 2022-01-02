@@ -1,7 +1,7 @@
 import json
 import numpy as np
 from pysocialforce.data.parameters import DataIndex as Index
-
+from pysocialforce.video import result_data_func
 
 class ResultData(object):
     def __init__(self, origin_path, gt_path):
@@ -76,5 +76,29 @@ class ResultData(object):
             fde_sum += self.fde_of_person(person_idx)
         return fde_sum / self.num_person
 
+    def risk_index_of_person(self, person_idx, distance):
+        start, finish = self.ade_range(person_idx)
+        ctn = 0
+        check_data = []
+        for time in range(start, finish+1):
+            data = self.origin_states[time]            
+            for idx, person_data in enumerate(data):
+                is_visible = person_data[Index.visible.index] == 1
+                if idx is not person_idx and is_visible:
+                    dis = result_data_func.distance(data, person_idx, idx)
+                    if dis < distance:
+                        ctn += 1
+                        check_data.append(time)
+        return ctn, finish-start + 1, check_data
+
+    def risk_index_of_scene(self, distance):
+        result_data = {}
+        for person_idx in range(0, self.num_person):        
+            ctn, total_time, check_data = self.risk_index_of_person(person_idx, distance)
+            result_data[person_idx] = ctn / total_time
+        return result_data
+            
+                    
+            
         
 
