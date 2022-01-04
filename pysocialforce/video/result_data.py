@@ -133,7 +133,7 @@ class ResultData(object):
         data["result"][force_id] = {}
         data["result"][force_id]["simulation_time"] = len(self.origin_data)
         data["result"][force_id]["ade"] = self.ade_of_scene()
-        data["result"][force_id]["fde"] = self.fde_of_scene()
+        data["result"][force_id]["fde"] = 0
         data["result"][force_id]["social"] = self.risk_index_of_scene(2)
         return data
 

@@ -25,8 +25,8 @@ vid_path = os.path.abspath(vid_path)
 result_folder_path = setting_data["path"]["result_folder_path"]
 
 
-hp_path = os.path.join(vid_path, idx+"\\"+idx+"_hp.csv")
-vp_path = os.path.join(vid_path, idx+"\\"+idx+"_vp.csv")
+hp_path = os.path.join(vid_path, idx, idx+"_hp.csv")
+vp_path = os.path.join(vid_path, idx, idx+"_vp.csv")
 
 v = VideoData(hp_path, vp_path)
 
