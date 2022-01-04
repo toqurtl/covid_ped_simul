@@ -16,7 +16,8 @@ if len(sys.argv) > 2:
 else:
     force_idx = 0
 
-vid_path = os.path.abspath("C:\\Users\\toqurtl\\OneDrive\\연구\\pandemic\\data\\ped_texas\\origin\\opossite")
+
+vid_path = os.path.abspath("C:\\Users\\yoon9\\OneDrive\\연구\\pandemic\\data\\ped_texas\\origin\\opossite")
 
 hp_path = os.path.join(vid_path, idx+"\\"+idx+"_hp.csv")
 vp_path = os.path.join(vid_path, idx+"\\"+idx+"_vp.csv")

@@ -42,7 +42,8 @@ class Simulator(object):
         force_list = [
             forces.DesiredForce(),        
             forces.ObstacleForce(),
-            forces.Myforce()           
+            # forces.Myforce()
+            forces.PedRepulsiveForce()           
         ]
         group_forces = []
         if self.scene_config("enable_group"):

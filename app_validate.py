@@ -14,7 +14,7 @@ result_path = "data\\result\\"+idx+"_"+force_idx
 
 gt_path = result_path+"/gt_"+idx+".json"
 origin_path = result_path+"/result_"+idx+".json"
+valid_path = result_path+"/valid_"+idx+"_"+force_idx+".json"
 
 result_data = ResultData(origin_path, gt_path)
-
-print(result_data.risk_index_of_scene(2))
+result_data.to_json(valid_path, idx, force_idx)

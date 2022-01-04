@@ -93,12 +93,32 @@ class ResultData(object):
 
     def risk_index_of_scene(self, distance):
         result_data = {}
+        avg = 0
         for person_idx in range(0, self.num_person):        
             ctn, total_time, check_data = self.risk_index_of_person(person_idx, distance)
-            result_data[person_idx] = ctn / total_time
-        return result_data
+            avg += ctn / total_time
+        return avg / self.num_person
+
+    def result(self, vid_id, force_id):
+        data = {}
+        data["basic"] = {}
+        data["result"] = {}
+        data["basic"]["vid_id"] = vid_id
+        data["basic"]["num_person"] = self.num_person
+        data["basic"]["gt_time"] = len(self.gt_data)
+        data["result"][force_id] = {}
+        data["result"][force_id]["simulation_time"] = len(self.origin_data)
+        data["result"][force_id]["ade"] = self.ade_of_scene()
+        data["result"][force_id]["fde"] = self.fde_of_scene()
+        data["result"][force_id]["social"] = self.risk_index_of_scene(2)
+        return data
+
             
                     
-            
+    def to_json(self, file_path, vid_id, force_id):
+        state = self.result(vid_id, force_id)
+        with open(file_path, 'w') as f:
+            json.dump(state, f, indent=4)
+        return
         
 
