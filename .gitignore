@@ -12,4 +12,7 @@ __pycache__/
 playground.py
 testground.py
 new_playground.py
+
+# setting
 setting.cfg
+setting.json
