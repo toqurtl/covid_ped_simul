@@ -16,8 +16,14 @@ if len(sys.argv) > 2:
 else:
     force_idx = 0
 
+with open("setting.json", 'r') as f:
+    setting_data = json.load(f)
 
-vid_path = os.path.abspath("C:\\Users\\yoon9\\OneDrive\\연구\\pandemic\\data\\ped_texas\\origin\\opossite")
+vid_path = setting_data["path"]["vid_folder_path"]
+vid_path = os.path.abspath(vid_path)
+
+result_folder_path = setting_data["path"]["result_folder_path"]
+
 
 hp_path = os.path.join(vid_path, idx+"\\"+idx+"_hp.csv")
 vp_path = os.path.join(vid_path, idx+"\\"+idx+"_vp.csv")
@@ -25,7 +31,7 @@ vp_path = os.path.join(vid_path, idx+"\\"+idx+"_vp.csv")
 v = VideoData(hp_path, vp_path)
 
 
-result_path = "data\\result\\"+idx+"_"+force_idx
+result_path = os.path.join(result_folder_path, str(idx)+"_"+str(force_idx))
 if not os.path.exists(result_path):
     os.mkdir(result_path)
 
@@ -57,16 +63,19 @@ s = Simulator(
     # time_table = None
 )
 
+s.set_ped_force(int(force_idx))
+
 s.simulate()
+print(s.time_step)
 
 s.result_to_json(result_path+"/result_"+idx+".json")
 
 
-with SceneVisualizer(s.peds, s, result_path+"/animate_"+idx) as sv:
-    sv.animate()        
+# with SceneVisualizer(s.peds, s, result_path+"/animate_"+idx) as sv:
+#     sv.animate()        
 
-with SceneVisualizer(s.peds, s, result_path+"/plot_"+idx) as sv:
-    sv.plot()
+# with SceneVisualizer(s.peds, s, result_path+"/plot_"+idx) as sv:
+#     sv.plot()
 
 
 

@@ -43,7 +43,7 @@ class Simulator(object):
             forces.DesiredForce(),        
             forces.ObstacleForce(),
             # forces.Myforce()
-            forces.PedRepulsiveForce()           
+            # forces.PedRepulsiveForce()        
         ]
         group_forces = []
         if self.scene_config("enable_group"):
@@ -54,7 +54,18 @@ class Simulator(object):
         
         self.forces = force_list
         return
-    
+        
+    def set_ped_force(self, force_idx):
+        if force_idx == 0:
+            force = forces.Myforce()
+        else:
+            force = forces.PedRepulsiveForce()
+
+        force.init(self, self.config)
+        self.forces.append(force)
+        return
+        
+
     def set_step_width(self):
         new_step_width = 0
         if self.time_table is None:
@@ -126,8 +137,7 @@ class Simulator(object):
     # calculate social force and make result
     # visible state + force -> new_state
     def do_step(self, visible_state, visible_max_speeds, visible_group=None):        
-        self.peds.set_state(visible_state, visible_group, visible_max_speeds)
-        print(self.time_step)
+        self.peds.set_state(visible_state, visible_group, visible_max_speeds)        
         force = self.compute_forces()              
         next_state, next_group_state = self.peds.step(force, visible_state)                
         return next_state, next_group_state
