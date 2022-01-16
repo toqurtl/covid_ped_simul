@@ -16,8 +16,8 @@ factor = 1.5
 v0 = 2.1
 sigma = 0.3
 # fov params
-fov_phi = 10.0
-fov_factor = 0.1 # out of view factor
+fov_phi = 100.0
+fov_factor = 0.5 # out of view factor
 
 [space_repulsive_force]
 factor = 1

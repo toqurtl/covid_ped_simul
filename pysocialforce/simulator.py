@@ -29,7 +29,10 @@ class Simulator(object):
         self.time_table = time_table
         self.step_width_list = []
 
+        self.experiment_force_list = []
+
         self._initialize_force()
+        self._initialize_experiment_force()
         self._initialize()
         return
 
@@ -42,8 +45,6 @@ class Simulator(object):
         force_list = [
             forces.DesiredForce(),        
             forces.ObstacleForce(),
-            # forces.Myforce()
-            # forces.PedRepulsiveForce()        
         ]
         group_forces = []
         if self.scene_config("enable_group"):
@@ -54,18 +55,30 @@ class Simulator(object):
         
         self.forces = force_list
         return
+
+    def _initialize_experiment_force(self):
+        force_list = [            
+            forces.SocialForce(),
+            forces.PedRepulsiveForce(),
+            forces.Myforce()
+        ]
+        for force in force_list:
+            force.init(self, self.config)
+        self.experiment_force_list = force_list
+        return
         
     def set_ped_force(self, force_idx):
         if force_idx == 0:
             force = forces.Myforce()
-        else:
+        elif force_idx == 1:
             force = forces.PedRepulsiveForce()
+        else:
+            force = forces.SocialForce()
 
         force.init(self, self.config)
         self.forces.append(force)
         return
         
-
     def set_step_width(self):
         new_step_width = 0
         if self.time_table is None:
@@ -78,8 +91,13 @@ class Simulator(object):
         self.peds.step_width = new_step_width
         self.step_width_list.append(new_step_width)
         return
+
     def compute_forces(self):
         return sum(map(lambda x: x.get_force(), self.forces))
+    
+    def compare_forces(self):        
+        for force in self.experiment_force_list:
+            print(force.get_force())            
     
     """Properties"""    
     def get_states(self):
@@ -93,7 +111,8 @@ class Simulator(object):
     def simulate(self):
         while True:            
             is_finished = self.step_once()
-
+            self.compare_forces()
+            print("tt")
             if is_finished: 
                 break
             

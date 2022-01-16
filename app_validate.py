@@ -16,7 +16,8 @@ with open("setting.json", 'r') as f:
 
 result_folder_path = setting_data["path"]["result_folder_path"]
 
-result_path = os.path.join(result_folder_path, idx+"_"+force_idx)
+# result_path = os.path.join(result_folder_path, idx+"_"+force_idx)
+result_path = os.path.join(result_folder_path, idx, force_idx)
 
 gt_path = result_path+"/gt_"+idx+".json"
 origin_path = result_path+"/result_"+idx+".json"

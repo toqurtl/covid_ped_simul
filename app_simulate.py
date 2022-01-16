@@ -30,8 +30,16 @@ vp_path = os.path.join(vid_path, idx, idx+"_vp.csv")
 
 v = VideoData(hp_path, vp_path)
 
+env_path = os.path.join(result_folder_path, str(idx))
+result_path = os.path.join(env_path, str(force_idx))
 
-result_path = os.path.join(result_folder_path, str(idx)+"_"+str(force_idx))
+# result_path = os.path.join(result_folder_path, str(idx)+"_"+str(force_idx))
+# if not os.path.exists(result_path):
+#     os.mkdir(result_path)
+
+if not os.path.exists(env_path):
+    os.mkdir(env_path)
+
 if not os.path.exists(result_path):
     os.mkdir(result_path)
 
@@ -71,11 +79,11 @@ print(s.time_step)
 s.result_to_json(result_path+"/result_"+idx+".json")
 
 
-# with SceneVisualizer(s.peds, s, result_path+"/animate_"+idx) as sv:
-#     sv.animate()        
+with SceneVisualizer(s.peds, s, result_path+"/animate_"+idx) as sv:
+    sv.animate()        
 
-# with SceneVisualizer(s.peds, s, result_path+"/plot_"+idx) as sv:
-#     sv.plot()
+with SceneVisualizer(s.peds, s, result_path+"/plot_"+idx) as sv:
+    sv.plot()
 
 
 
