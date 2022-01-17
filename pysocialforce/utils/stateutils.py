@@ -64,8 +64,8 @@ def normalize(vecs: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
 @njit
 def desired_directions(state: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     """Given the current state and destination, compute desired direction."""
-    destination_vectors = state[:, 4:6] - state[:, 0:2]
-    directions, dist = normalize(destination_vectors)
+    destination_vectors = state[:, 4:6] - state[:, 0:2]    
+    directions, dist = normalize(destination_vectors)    
     return directions, dist
 
 

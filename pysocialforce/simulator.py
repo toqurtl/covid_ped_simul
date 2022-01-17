@@ -92,12 +92,12 @@ class Simulator(object):
         self.step_width_list.append(new_step_width)
         return
 
-    def compute_forces(self):
+    def compute_forces(self):        
         return sum(map(lambda x: x.get_force(), self.forces))
     
     def compare_forces(self):        
         for force in self.experiment_force_list:
-            print(force.get_force())            
+            pass
     
     """Properties"""    
     def get_states(self):
@@ -111,8 +111,7 @@ class Simulator(object):
     def simulate(self):
         while True:            
             is_finished = self.step_once()
-            self.compare_forces()
-            print("tt")
+            # self.compare_forces()
             if is_finished: 
                 break
             
@@ -122,28 +121,30 @@ class Simulator(object):
 
     def step_once(self):
         # update_visible        
-        whole_state = self.peds_info.current_state.copy()        
+        whole_state = self.peds_info.current_state.copy()
+        print("test")
+        print(whole_state)     
         whole_state = UpdateManager.update_finished(whole_state)
-
         # whole_state = UpdateManager.update_visible(whole_state, self.time_step)        
-        visible_state = UpdateManager.get_visible(whole_state)        
-                
+        visible_state = UpdateManager.get_visible(whole_state)         
         visible_idx = UpdateManager.get_visible_idx(whole_state)
-        visible_max_speeds = self.max_speeds[visible_idx]        
+        visible_max_speeds = self.max_speeds[visible_idx]       
+    
         if self.check_finish():
             return True
 
-        self.set_step_width()        
+        self.set_step_width()
         next_group_state = None
         if len(visible_state) > 0:
             # 계산 결과를 반영하고
-            next_state, next_group_state = self.do_step(visible_state, visible_max_speeds, None)            
+            next_state, next_group_state = self.do_step(visible_state, visible_max_speeds, None)                         
             whole_state = UpdateManager.new_state(whole_state, next_state)
-        
+            
         # 계산안하고 등장해야 하는 애들 반영        
+        
         whole_state = UpdateManager.update_new_peds(whole_state, self.time_step)                        
         
-        # 결과 저장        
+        # 결과 저장
         is_updated = self.after_step(whole_state, next_group_state)
         if is_updated:            
             self.peds.time_step += 1
@@ -157,7 +158,7 @@ class Simulator(object):
     # visible state + force -> new_state
     def do_step(self, visible_state, visible_max_speeds, visible_group=None):        
         self.peds.set_state(visible_state, visible_group, visible_max_speeds)        
-        force = self.compute_forces()              
+        force = self.compute_forces()        
         next_state, next_group_state = self.peds.step(force, visible_state)                
         return next_state, next_group_state
 

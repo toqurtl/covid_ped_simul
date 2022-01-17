@@ -57,17 +57,19 @@ class PedPedPotential(object):
         speeds = stateutils.speeds(state)
         # desired_directions = stateutils.desired_directions(state)
         desired_directions, desired_distance = stateutils.desired_directions(state)
+        
         dx = np.array([[[delta, 0.0]]])
         dy = np.array([[[0.0, delta]]])
-
+        
         v = self.value_r_ab(r_ab, speeds, desired_directions)
+        
         dvdx = (self.value_r_ab(r_ab + dx, speeds, desired_directions) - v) / delta
-        dvdy = (self.value_r_ab(r_ab + dy, speeds, desired_directions) - v) / delta
-
+        dvdy = (self.value_r_ab(r_ab + dy, speeds, desired_directions) - v) / delta        
+        
         # remove gradients from self-intereactions
         np.fill_diagonal(dvdx, 0.0)
         np.fill_diagonal(dvdy, 0.0)
-
+        
         return np.stack((dvdx, dvdy), axis=-1)
 
 

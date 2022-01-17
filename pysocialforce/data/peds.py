@@ -36,7 +36,7 @@ class Pedestrians(object):
         is_updated, new_state_list = 0, []
         for ped in self.peds.values():
             check, new_state = ped.update(new_peds_state)            
-            new_state_list.append(new_state)
+            new_state_list.append(new_state)            
             is_updated += check
 
         is_updated = is_updated == len(self.peds)

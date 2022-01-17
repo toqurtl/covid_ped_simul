@@ -44,7 +44,7 @@ class CustomUtils(object):
 
     @classmethod
     def get_distance_matrix(cls, peds):
-        diff_list = stateutils.vec_diff(peds.state[:,:2])
+        diff_list = stateutils.vec_diff(peds.state[:,:2])        
         person_list = []
         for person_diff in diff_list:
             detail_list = []
@@ -57,12 +57,18 @@ class CustomUtils(object):
     def get_angle_matrix(cls, peds):
         potential_func = PedPedPotential(peds.step_width, v0=2.1, sigma=0.3)
         f_ab = -1.0 * potential_func.grad_r_ab(peds.state)
+        
         forces_direction = -f_ab
-        desired_direction = peds.desired_directions()
+        desired_direction = peds.desired_directions()        
         dot_matrix = np.einsum("aj,abj->ab", desired_direction, forces_direction)
-        norm_norm_matrix = np.linalg.norm(forces_direction, axis=-1)
+        norm_norm_matrix = np.linalg.norm(forces_direction, axis=-1)      
         np.fill_diagonal(norm_norm_matrix, 1)
+        
         angle_matrix = dot_matrix / norm_norm_matrix
+        # force가 0일 때 처리하기 위함(norm_norm_matrix가 0이 됨)
+        angle_matrix[np.isnan(angle_matrix)] = -1        
+        angle_matrix[np.isinf(angle_matrix)] = -1
+        
         # Runtime Error, diagonal이 다 0이라서 그럼. 아래서 처리하므로 괜찮       
         np.fill_diagonal(angle_matrix, 0)
         return angle_matrix
