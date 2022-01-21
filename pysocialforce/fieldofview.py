@@ -1,7 +1,6 @@
 """Field of view computation."""
 
 import numpy as np
-from pysocialforce.custom import utils
 from pysocialforce.utils import stateutils
 
 class FieldOfView(object):

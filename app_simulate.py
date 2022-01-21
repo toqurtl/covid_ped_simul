@@ -1,7 +1,7 @@
 import numpy as np
 from pysocialforce.simulator import Simulator
 import json
-from pysocialforce.data.peds import Pedestrians
+from pysocialforce.video.peds import Pedestrians
 from pysocialforce.video.video_data import VideoData
 from pysocialforce.utils.new_plot import SceneVisualizer
 import sys
@@ -16,27 +16,20 @@ if len(sys.argv) > 2:
 else:
     force_idx = 0
 
+# Load Setting
 with open("setting.json", 'r') as f:
     setting_data = json.load(f)
 
+# Vid Path
 vid_path = setting_data["path"]["vid_folder_path"]
 vid_path = os.path.abspath(vid_path)
-
-result_folder_path = setting_data["path"]["result_folder_path"]
-
-
-hp_path = os.path.join(vid_path, idx, idx+"_hp.csv")
-vp_path = os.path.join(vid_path, idx, idx+"_vp.csv")
-
+hp_path, vp_path = os.path.join(vid_path, idx, "hp.csv"), os.path.join(vid_path, idx, "vp.csv")
 v = VideoData(hp_path, vp_path)
 
+# Result Path
+result_folder_path = setting_data["path"]["result_folder_path"]
 env_path = os.path.join(result_folder_path, str(idx))
 result_path = os.path.join(env_path, str(force_idx))
-
-# result_path = os.path.join(result_folder_path, str(idx)+"_"+str(force_idx))
-# if not os.path.exists(result_path):
-#     os.mkdir(result_path)
-
 if not os.path.exists(env_path):
     os.mkdir(env_path)
 
@@ -45,28 +38,15 @@ if not os.path.exists(result_path):
 
 v.to_json(result_path+"/data_"+idx+".json")    
 
-
 with open(result_path+'/data_'+idx+'.json', 'r') as f:
     json_data = json.load(f)
-
 
 v.trajectory_to_json(result_path+"/gt_"+idx+".json")
 
 # initialize
 peds = Pedestrians(json_data)
-# obs = [[4, 4, -5, 14], [-4, -4, -5, 0], [-4, -4, 4, 14]]
-obs = [
-        [5.15, 5.15, -8, 16],
-        [-1.44, -1.44, -10, -1.2], 
-        [-1.44, -1.44, 0, 6], 
-        [-1.44, -1.44, 7.2, 16],
-        [-1.44, 0, 7.2, 7.2],
-        [0, 0, 7.2, 8.2],
-        [-1.44, 0, 8.2, 8.2],
-        [-1.44, 0, 0, 0],
-        [0, 0, 0, 1],
-        [-1.44, 0, 1, 1],
-    ]
+
+obs = setting_data["obstacles"]
 
 s = Simulator(
     peds,

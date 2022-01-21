@@ -3,7 +3,10 @@ from typing import List
 
 import numpy as np
 from pysocialforce.utils import stateutils
-from pysocialforce.custom.inspector import add_agent
+
+# def add_agent(existing_state, new_state: np.ndarray):
+#     next_state = np.append(existing_state, new_state, axis=0)
+#     return next_state, stateutils.speeds(next_state)
 
 class PedState:
     """Tracks the state of pedstrains and social groups"""
@@ -87,21 +90,16 @@ class PedState:
         next_groups = self.groups
         if groups is not None:
             next_groups = groups
-        
-        # if self.time_step == 20:            
-        #     next_state, speed = add_agent(next_state, np.array([[3.0, 0.0, 0.0, 0.5, 4.0, 10.0, 2, 1, 3]]))
-        #     self.initial_speeds = speed
 
         self.update(next_state, next_groups)
 
-    # def initial_speeds(self):
-    #     return stateutils.speeds(self.ped_states[0])
-
     # 나중에 그룹도 처리해야함
     def add_agent_to_state(self, new_agent_state):
-        next_state = self.state        
-        next_state, speed = add_agent(next_state, np.array(new_agent_state))
-        self.initial_speeds = speed
+        # next_state = self.state
+        # next_state, speed = add_agent(next_state, np.array(new_agent_state))
+        # self.initial_speeds = speed
+        next_state = np.append(self.state, np.array(new_agent_state), axis=0)
+        self.initial_speeds = stateutils.speeds(next_state)
         
     def desired_directions(self):
         return stateutils.desired_directions(self.state)[0]

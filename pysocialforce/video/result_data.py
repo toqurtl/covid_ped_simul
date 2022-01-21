@@ -1,6 +1,6 @@
 import json
 import numpy as np
-from pysocialforce.data.parameters import DataIndex as Index
+from pysocialforce.video.parameters import DataIndex as Index
 from pysocialforce.video import result_data_func
 
 class ResultData(object):

@@ -1,4 +1,4 @@
-from pysocialforce.data.parameters import DataIndex as Index
+from pysocialforce.video.parameters import DataIndex as Index
 
 
 def distance(data, p_idx_1, p_idx_2):

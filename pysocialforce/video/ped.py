@@ -1,6 +1,6 @@
 import numpy as np
 from .parameters import DataIndex as Index
-from pysocialforce.data import parameters
+from pysocialforce.video import parameters
 
 index_list = sorted([index for index in Index], key=lambda data: data.index)
 

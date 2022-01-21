@@ -7,8 +7,9 @@ import numpy as np
 from pysocialforce.potentials import PedPedPotential, PedSpacePotential
 from pysocialforce.fieldofview import FieldOfView
 from pysocialforce.utils import Config, stateutils, logger
-from pysocialforce.custom.utils import CustomUtils
-from pysocialforce.data.parameters import DataIndex as Index
+# from pysocialforce.custom.utils import CustomUtils
+from pysocialforce.utils.custom_utils import CustomUtils
+from pysocialforce.video.parameters import DataIndex as Index
 
 def camel_to_snake(camel_case_string):
     """Convert CamelCase to snake_case"""
@@ -344,4 +345,4 @@ class Myforce(Force):
         term = term_1 * term_2 * in_desired_distance        
         term = np.repeat(np.expand_dims(term, axis=2), 2, axis=2)
         e_ij = CustomUtils.ped_directions(self.peds)          
-        return np.sum(e_ij * term, axis=1) * 10
+        return np.sum(e_ij * term, axis=1)

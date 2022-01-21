@@ -4,7 +4,7 @@ from pysocialforce.utils import DefaultConfig
 from pysocialforce.envstate import EnvState
 from pysocialforce.pedstate import PedState
 from pysocialforce import forces
-from pysocialforce.data.peds import Pedestrians
+from pysocialforce.video.peds import Pedestrians
 from pysocialforce.update_manager import UpdateManager
 import numpy as np
 import json
@@ -32,7 +32,7 @@ class Simulator(object):
         self.experiment_force_list = []
 
         self._initialize_force()
-        self._initialize_experiment_force()
+        # self._initialize_experiment_force()
         self._initialize()
         return
 
@@ -98,11 +98,6 @@ class Simulator(object):
     def compare_forces(self):        
         for force in self.experiment_force_list:
             pass
-    
-    """Properties"""    
-    def get_states(self):
-        # 이름 변경필요 -> 전체 결과를 뽑는거라서 peds를 쓰지 않을 것임
-        return self.peds.get_states()
 
     def get_obstacles(self):
         return self.env.obstacles
@@ -110,8 +105,7 @@ class Simulator(object):
     """시뮬레이션 함수"""
     def simulate(self):
         while True:            
-            is_finished = self.step_once()
-            # self.compare_forces()
+            is_finished = self.step_once()            
             if is_finished: 
                 break
             
@@ -122,26 +116,21 @@ class Simulator(object):
     def step_once(self):
         # update_visible        
         whole_state = self.peds_info.current_state.copy()
-        print("test")
-        print(whole_state)     
-        whole_state = UpdateManager.update_finished(whole_state)
-        # whole_state = UpdateManager.update_visible(whole_state, self.time_step)        
+        whole_state = UpdateManager.update_finished(whole_state)        
         visible_state = UpdateManager.get_visible(whole_state)         
         visible_idx = UpdateManager.get_visible_idx(whole_state)
-        visible_max_speeds = self.max_speeds[visible_idx]       
-    
+        visible_max_speeds = self.max_speeds[visible_idx]
+
         if self.check_finish():
             return True
 
         self.set_step_width()
         next_group_state = None
-        if len(visible_state) > 0:
-            # 계산 결과를 반영하고
+        if len(visible_state) > 0:            
             next_state, next_group_state = self.do_step(visible_state, visible_max_speeds, None)                         
             whole_state = UpdateManager.new_state(whole_state, next_state)
             
-        # 계산안하고 등장해야 하는 애들 반영        
-        
+        # 계산안하고 등장해야 하는 애들 반영
         whole_state = UpdateManager.update_new_peds(whole_state, self.time_step)                        
         
         # 결과 저장

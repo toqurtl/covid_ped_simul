@@ -1,11 +1,9 @@
 import numpy as np
-from pysocialforce.data.parameters import DataIndex as Index
+from pysocialforce.video.parameters import DataIndex as Index
 
 
 class UpdateManager(object):
     # check functions
-    
-
     @classmethod
     def is_started(cls, state: np.ndarray, time_step):
         return state[:, Index.start_time.index] <= time_step

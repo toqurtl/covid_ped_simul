@@ -55,10 +55,7 @@ class PedState:
         return stateutils.speeds(self.state)
 
     def set_state(self, state, groups, visible_max_speeds):
-        self.current_state = state
-        # if self.initial_speeds is None:            
-        #     self.initial_speeds = self.speeds()     
-        # self.max_speeds = self.max_speed_multiplier * self.initial_speeds
+        self.current_state = state        
         self.max_speeds = visible_max_speeds
         self.groups = groups
 

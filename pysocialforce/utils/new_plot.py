@@ -17,7 +17,7 @@ from .logging import logger
 from .stateutils import minmax
 
 from pysocialforce.simulator import Simulator
-from pysocialforce.data.parameters import DataIndex as Index
+from pysocialforce.video.parameters import DataIndex as Index
 
 
 @contextmanager

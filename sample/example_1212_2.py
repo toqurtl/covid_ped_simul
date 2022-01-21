@@ -6,7 +6,8 @@ from pysocialforce.forces import Force, PedRepulsiveForce
 from pysocialforce.potentials import PedPedPotential
 from pysocialforce.utils import Config, stateutils, logger
 from pysocialforce.fieldofview import FieldOfView
-from pysocialforce.custom.utils import CustomUtils
+# from pysocialforce.custom.utils import CustomUtils
+from pysocialforce.utils.custom_utils import CustomUtils
 
 
 if __name__ == "__main__":
